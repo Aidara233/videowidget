@@ -18,33 +18,33 @@
 
 VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent)
 {
-    m_mediaPlayer = new QMediaPlayer(this);
+    m_mediaPlayer = new QMediaPlayer(this); // 播放器组件
     QVideoWidget *videoWidget = new QVideoWidget;
 
-    QAbstractButton *openButton = new QPushButton(tr("Open..."));
+    QAbstractButton *openButton = new QPushButton(tr("Open...")); // 打开文件按钮
     connect(openButton, &QAbstractButton::clicked, this, &VideoPlayer::openFile);
 
-    m_playButton = new QPushButton;
+    m_playButton = new QPushButton; // 播放键
     m_playButton->setEnabled(false);
     m_playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
 
-    connect(m_playButton, &QAbstractButton::clicked, this, &VideoPlayer::play);
+    connect(m_playButton, &QAbstractButton::clicked, this, &VideoPlayer::play); // 连接信号槽，点击播放键->视频播放
 
-    m_positionSlider = new QSlider(Qt::Horizontal);
+    m_positionSlider = new QSlider(Qt::Horizontal); // 进度条
     m_positionSlider->setRange(0, 0);
 
-    connect(m_positionSlider, &QAbstractSlider::sliderMoved, this, &VideoPlayer::setPosition);
+    connect(m_positionSlider, &QAbstractSlider::sliderMoved, this, &VideoPlayer::setPosition); // 连接信号槽，拖动滑动条->设置播放进度
 
-    m_errorLabel = new QLabel;
+    m_errorLabel = new QLabel; // 报错文本
     m_errorLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
 
-    QBoxLayout *controlLayout = new QHBoxLayout;
+    QBoxLayout *controlLayout = new QHBoxLayout; // 弄个盒子把下面的装起来
     controlLayout->setContentsMargins(0, 0, 0, 0);
     controlLayout->addWidget(openButton);
     controlLayout->addWidget(m_playButton);
     controlLayout->addWidget(m_positionSlider);
 
-    QBoxLayout *layout = new QVBoxLayout;
+    QBoxLayout *layout = new QVBoxLayout; // 弄个大盒子全装起来
     layout->addWidget(videoWidget);
     layout->addLayout(controlLayout);
     layout->addWidget(m_errorLabel);
@@ -61,7 +61,7 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent)
 
 VideoPlayer::~VideoPlayer() { }
 
-void VideoPlayer::openFile()
+void VideoPlayer::openFile() // 打开指定的文件
 {
     QFileDialog fileDialog(this);
     fileDialog.setAcceptMode(QFileDialog::AcceptOpen);
@@ -72,7 +72,7 @@ void VideoPlayer::openFile()
         setUrl(fileDialog.selectedUrls().constFirst());
 }
 
-void VideoPlayer::setUrl(const QUrl &url)
+void VideoPlayer::setUrl(const QUrl &url) // 打开在线文件
 {
     m_errorLabel->setText(QString());
     setWindowFilePath(url.isLocalFile() ? url.toLocalFile() : QString());
@@ -80,7 +80,7 @@ void VideoPlayer::setUrl(const QUrl &url)
     m_playButton->setEnabled(true);
 }
 
-void VideoPlayer::play()
+void VideoPlayer::play() // 播放
 {
     switch (m_mediaPlayer->playbackState()) {
     case QMediaPlayer::PlayingState:
@@ -92,7 +92,7 @@ void VideoPlayer::play()
     }
 }
 
-void VideoPlayer::mediaStateChanged(QMediaPlayer::PlaybackState state)
+void VideoPlayer::mediaStateChanged(QMediaPlayer::PlaybackState state) // 视频状态更改
 {
     switch (state) {
     case QMediaPlayer::PlayingState:
@@ -104,22 +104,22 @@ void VideoPlayer::mediaStateChanged(QMediaPlayer::PlaybackState state)
     }
 }
 
-void VideoPlayer::positionChanged(qint64 position)
+void VideoPlayer::positionChanged(qint64 position) // 调整位置后
 {
     m_positionSlider->setValue(position);
 }
 
-void VideoPlayer::durationChanged(qint64 duration)
+void VideoPlayer::durationChanged(qint64 duration) // 视频进度变动
 {
     m_positionSlider->setRange(0, duration);
 }
 
-void VideoPlayer::setPosition(int position)
+void VideoPlayer::setPosition(int position) // 设置视频进度
 {
     m_mediaPlayer->setPosition(position);
 }
 
-void VideoPlayer::handleError()
+void VideoPlayer::handleError() // 报错
 {
     if (m_mediaPlayer->error() == QMediaPlayer::NoError)
         return;
